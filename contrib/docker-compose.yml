@@ -1,0 +1,79 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:1.17
+    ports:
+      - 80:80
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./:/src
+      - ./vhost.conf:/etc/nginx/conf.d/default.conf
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Fpm.Dockerfile
+    volumes:
+      - ./app:/src/app
+      - ./bootstrap:/src/bootstrap
+      - ./config:/src/config
+      - ./data:/src/data
+      - ./database:/src/database
+      - ./docker:/src/docker
+      - ./logs:/src/logs
+      - ./public:/src/public
+      - ./resources:/src/resources
+      - ./routes:/src/routes
+      - ./storage:/src/storage
+      - ./tests:/src/tests
+      - ./composer.json:/src/composer.json
+      - ./composer.lock:/src/composer.lock
+      - ./.env:/src/.env
+      - ./.env.example:/src/.env.example
+      - ./phpunit.xml:/src/phpunit.xml
+      - ./ruleset.xml:/src/ruleset.xml
+    links:
+      - mysql
+      - redis
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      REDIS_SERVICE_HOST: redis
+
+  mysql:
+    image: "mysql:5"
+    ports:
+      - "33059:3306"
+    platform: linux/x86_64
+    volumes:
+      - ./shop-db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=shop
+
+  redis:
+    image: redis:3.2.6-alpine
+    platform: linux/x86_64
+
+
+  node:
+    build:
+      context: .
+      dockerfile: Node.Dockerfile
+    ports:
+        - '3000:3000'
+        - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+    platform: linux/x86_64
+    tty: true
+    volumes:
+      - ./resources:/src/resources
+      - ./public:/src/public
+      - ./tailwind.config.js:/src/tailwind.config.js
+      - '/src/node_modules'
+
+
