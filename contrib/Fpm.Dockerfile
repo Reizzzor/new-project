@@ -1,4 +1,4 @@
-FROM composer:2.1 AS composer
+FROM composer:2.2 AS composer
 FROM php:8.1-fpm as base
 
 RUN apt update && \

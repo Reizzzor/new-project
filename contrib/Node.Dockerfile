@@ -4,7 +4,7 @@ FROM node:16.13-alpine
 WORKDIR /src
 
 # Node modules
-COPY package.json package-lock.json ./
+COPY package*.jsonn ./
 RUN npm install -g npm@9.5.1
 RUN npm install --force
 RUN npx tailwindcss init -p

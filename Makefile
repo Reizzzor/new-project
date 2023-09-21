@@ -11,13 +11,12 @@ install:
 	docker run -d --name new_project new_project
 	docker exec new_project composer create-project laravel/laravel /new_project
 	docker cp new_project:/new_project .
-	mv ./new_project/* ./
-	rm -R new_project
 	docker stop new_project
 	docker rm new_project
 	docker rmi new_project
-	cp contrib/* ./
-	rm contrib
+	mv new_project/* ./
+	rsync -a contrib/ .
+	rm -R contrib new_project Dockerfile
 
 
 
